@@ -1,5 +1,5 @@
 """
-set1: challenge 2
+set1: Fixed XOR
 xor two hexstrings together
 """
 from binascii import unhexlify

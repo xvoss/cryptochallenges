@@ -1,5 +1,5 @@
 """
-set1: challenge1.py
+set1: Convert hex to base64
 decode a base64 encode hex string
 """
 import base64
