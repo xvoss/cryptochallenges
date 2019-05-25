@@ -1,5 +1,6 @@
 """
 set1: Break repeating-key XOR
+python challenge6.py 3
 """
 import sys
 import base64
