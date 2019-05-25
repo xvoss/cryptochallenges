@@ -17,12 +17,12 @@ class XorKeyScores():
     :param cipherhex: an XOR'd string in hexstring form to be decrypted
     :param plaintexts: map in the form frequency score: key
     """
-    def __init__(self, cipherhex, keys):
-        self.ciphertext = binascii.unhexlify(cipherhex)
+    def __init__(self, ctext, keys):
+        self.ctext = ctext
         self.key_score = dict()
 
         for k in keys:
-            test_text = self.xor_byte(self.ciphertext, k)
+            test_text = self.xor_byte(self.ctext, k)
             self.key_score[self.freq_score(test_text)] = k
 
     def xor_byte(self, cbytes, byte):
@@ -62,16 +62,16 @@ class XorKeyScores():
         return high_score, key
 
     def to_text(self, key):
-        return self.xor_byte(self.ciphertext, key).decode()
+        return self.xor_byte(self.ctext, key).decode()
 
 
 def main():
-    # test ciphertext given
+    # test ctext given
     input1 = b"1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a" \
              b"393b3736"
 
     keys = [byte for byte in range(2 ** 7)]
-    bruteforce = XorKeyScores(input1, keys)
+    bruteforce = XorKeyScores(binascii.unhexlify(input1), keys)
 
     score, key = bruteforce.pop_key()
 

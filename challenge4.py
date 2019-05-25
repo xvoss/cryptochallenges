@@ -15,7 +15,7 @@ def main():
     with open("data/4.txt", "r") as texts:
         for line in texts:
             hexstrings.append(line.strip())
-            c = challenge3.XorKeyScores(line.strip(), keys)
+            c = challenge3.XorKeyScores(binascii.unhexlify(line.strip()), keys)
             ciphers.append(c)
 
     # most likely english text out of each individual XOR hexstring
