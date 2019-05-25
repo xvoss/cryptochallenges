@@ -1,8 +1,11 @@
 """
 set 1: AES in EBC mode
+
+Test for encrypting texts in AES
 """
 from Crypto.Cipher import AES
 import base64
+
 
 def main():
     KEY = b"YELLOW SUBMARINE"
@@ -13,7 +16,6 @@ def main():
             ctextb64 += line.rstrip()
 
     ctext = base64.b64decode(ctextb64)
-
 
     cipher = AES.new(KEY, AES.MODE_ECB)
     ptext = cipher.decrypt(ctext)

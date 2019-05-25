@@ -1,7 +1,7 @@
 """
 set1: Single-byte XOR cipher
-decrypt a xor'd line of text by bruteforce each possible byte it may have been
-xor'd with
+decrypt a xor'd line of text by bruteforcing each possible byte it may have
+been xor'd with
 
 Note: for all my code variables with the name 'key' refers to cryptographic
 keys not dictionary keys.
@@ -11,11 +11,13 @@ import binascii
 
 class XorKeyScores():
     """
-    Store every possible decryption (key 0 to 2 ** 7) and rank unencrypted
-    text by the frequency of english characters
+    Store and rank every possible decryption key by the frequency of english
+    characters in that text. The resulting data structure is a stack where the
+    top element is the highest english frequency and the corresponding key
 
-    :param cipherhex: an XOR'd string in hexstring form to be decrypted
-    :param plaintexts: map in the form frequency score: key
+    :param ctext: cipher text with single byte XOR cipher
+    :param key_score: map in the form frequency score: key
+    :param keys: list of bytes of all possible keys to try
     """
     def __init__(self, ctext, keys):
         self.ctext = ctext
@@ -30,7 +32,8 @@ class XorKeyScores():
 
     def freq_score(self, cbytes):
         """
-        Text scores are determined by letter frequency in the english alphabet
+        Score string of bytes by the amount of common english characters it
+        contains. This is determined using a histogram of the english alphabet
         """
         freq = {
             'E': 12.02, 'T': 9.1, 'A': 8.12, 'O': 7.68, 'I': 7.31, 'N': 6.95,

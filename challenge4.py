@@ -1,6 +1,11 @@
 """
 set1: Detect single-character XOR
 
+A file of XOR'd strings of data is given. Only one of them has an english
+plain text. This script attempts to decrypt each XOR'd string (by bruteforce)
+And only stores the key with the highest frequency of english characters.
+Among those stored keys the one with the highest frequency is chosen
+as the true english plain text.
 """
 
 import binascii
