@@ -72,9 +72,6 @@ def main():
     cipher = AES_CBC(b"YELLOW SUBMARINE", b"\x00" * 16)
     output2 = cipher.decrypt(input2)
 
-    print("[*] Decrypted ciphertext:")
-    print(output2.decode('utf-8'))
-
 
 if __name__ == '__main__':
     main()
