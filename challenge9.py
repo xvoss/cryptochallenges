@@ -5,11 +5,20 @@ Test pkcs#7 method
 """
 
 def pkcs7_pad(block, bsize):
-    psize = bsize - len(block)
-    if psize == 0:
+    if len(block) == bsize:
         return block
-    pad = bytes([psize for _ in range(psize)])
-    return block + pad
+    elif len(block) < bsize:
+        psize = bsize - len(block)
+        pad = bytes([psize for _ in range(psize)])
+        return block + pad
+    elif len(block) > bsize:
+        end = len(block) % bsize
+        if end > 0:
+            pad = pkcs7_pad(block[-end:], bsize)
+            return block[:-end] + pad
+        else:
+            return block
+
 
 def main():
     input1 = b"YELLOW SUBMARINE"
