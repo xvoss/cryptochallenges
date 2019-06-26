@@ -14,7 +14,7 @@ class EcbOracle():
     def __init__(self, host, port, key, unknown):
         self.__host = host
         self.__port = port
-        self.__key = key
+        self.__cipher = AES.new(key, AES.MODE_ECB)
         self.__unknown = unknown
 
     def __get_response(self, connection):
@@ -39,12 +39,11 @@ class EcbOracle():
         print("[*] Got client: waiting for text to encrypt")
         text = self.__get_response(conn)
         print("[*] Got plaintext, encrypting...")
-        cipher = AES.new(self.__key, AES.MODE_ECB)
 
         # AES(user_text || unknown text)
         text += self.__unknown
         new_text = pkcs7_pad(text, 16)
-        ctext = cipher.encrypt(new_text)
+        ctext = self.__cipher.encrypt(new_text)
 
         clen = struct.pack("I", int(len(ctext)))
         conn.send(clen)

@@ -24,12 +24,12 @@ class EcbCrackerSimple():
         self.plaintext = b""
 
     def __is_ecb(self):
-    """
-    Confirm oracle uses ECB mode for AES encryption while finding the
-    blocksize. for each block size if the first block is the same as the rest,
-    then we know it is ecb and thats the block size.
-    :return: (if oracle uses ecb, and block size)
-    """
+        """
+        Confirm oracle uses ECB mode for AES encryption while finding the
+        blocksize. for each block size if the first block is the same as the
+        rest, then we know it is ecb and thats the block size.
+        :return: (if oracle uses ecb, and block size)
+        """
         # assume block size are powers of 2 and <= 2 ^ 10
         size = 2
         prev_block = None
@@ -67,10 +67,10 @@ class EcbCrackerSimple():
 
 
     def __decrypt(self):
-    """
-    TODO: It would be elegant to remove if statements when i = 0, no
-    padding is necessary
-    """
+        """
+        TODO: It would be elegant to remove if statements when i = 0, no
+        padding is necessary
+        """
         n = 0
         while True:
             for i in range(self.__blocksize)[::-1]:
