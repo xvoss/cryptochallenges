@@ -68,6 +68,7 @@ class EcbCrackerSimple():
 
     def __decrypt(self, start):
         """
+        :start: only add padding and decrypt from block start and forward
         TODO: It would be elegant to remove if statements when i = 0, no
         padding is necessary
         """
