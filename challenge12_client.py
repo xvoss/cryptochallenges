@@ -63,15 +63,15 @@ class EcbCrackerSimple():
         else:
             raise ValueError("[*] is_ecb did not detect ECB in oracle.")
 
-        self.__decrypt()
+        self.__decrypt(0)
 
 
-    def __decrypt(self):
+    def __decrypt(self, start):
         """
         TODO: It would be elegant to remove if statements when i = 0, no
         padding is necessary
         """
-        n = 0
+        n = start
         while True:
             for i in range(self.__blocksize)[::-1]:
 
