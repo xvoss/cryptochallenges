@@ -18,12 +18,12 @@ class EcbCrackerSimple():
     :param chars: (lowerbound, upperbound) range of bytes for bruteforcing
     """
     def __init__(self, oracle, chars):
-        self.__oracle = oracle
-        self.__chars = chars
-        self.__blocksize = None
+        self._oracle = oracle
+        self._chars = chars
+        self._blocksize = None
         self.plaintext = b""
 
-    def __is_ecb(self):
+    def _is_ecb(self):
         """
         Confirm oracle uses ECB mode for AES encryption while finding the
         blocksize. for each block size if the first block is the same as the
@@ -38,7 +38,7 @@ class EcbCrackerSimple():
 
             # 40 blocks of block size
             msg = b"A" * size * 40
-            ctext = self.__oracle.encrypt(msg)
+            ctext = self._encrypt(msg)
 
             cblocks = [ctext[i:i+size] for i in range(0, len(ctext), size)]
             for block in cblocks[:40]:
@@ -55,18 +55,18 @@ class EcbCrackerSimple():
         return (False, None)
 
     def start(self):
-        ecb, bsize = self.__is_ecb()
+        ecb, bsize = self._is_ecb()
         if ecb:
-            self.__blocksize = bsize
+            self._blocksize = bsize
             print("block chain mode is ECB")
-            print("block size = {}".format(self.__blocksize))
+            print("block size = {}".format(self._blocksize))
         else:
             raise ValueError("[*] is_ecb did not detect ECB in oracle.")
 
-        self.__decrypt(0)
+        self._decrypt(0)
 
 
-    def __decrypt(self, start):
+    def _decrypt(self, start):
         """
         :start: only add padding and decrypt from block start and forward
         TODO: It would be elegant to remove if statements when i = 0, no
@@ -74,25 +74,25 @@ class EcbCrackerSimple():
         """
         n = start
         while True:
-            for i in range(self.__blocksize)[::-1]:
+            for i in range(self._blocksize)[::-1]:
 
                 if i != 0:
                     msg = (b"A" * i)
                 else:
-                    msg = (b"A" * self.__blocksize)
+                    msg = (b"A" * self._blocksize)
 
-                ctext = self.__oracle.encrypt(msg)
+                ctext = self._encrypt(msg)
                 if n > len(ctext):
                     return True
 
                 if i != 0:
-                    trueblock = ctext[n:n + self.__blocksize]
+                    trueblock = ctext[n:n + self._blocksize]
                 else:
-                    n += self.__blocksize
-                    trueblock = ctext[n:n + self.__blocksize]
-                    n -= self.__blocksize
+                    n += self._blocksize
+                    trueblock = ctext[n:n + self._blocksize]
+                    n -= self._blocksize
 
-                matrix = self.__bruteforce(i, n)
+                matrix = self._bruteforce(i, n)
                 if trueblock in matrix.keys():
                     old_text = list(self.plaintext)
                     old_text.append(matrix[trueblock])
@@ -100,19 +100,27 @@ class EcbCrackerSimple():
                 else:
                     return False
 
-            n += self.__blocksize
+            n += self._blocksize
 
-    def __bruteforce(self, index, block):
-        lowerbound, upperbound = self.__chars[0], self.__chars[1]
+    def _bruteforce(self, index, block):
+        lowerbound, upperbound = self._chars[0], self._chars[1]
         matrix = {}
         for b in range(lowerbound, upperbound, 1):
             new_text = list(b"A" * index + self.plaintext)
             new_text.append(b)
-            ctext = self.__oracle.encrypt((bytes(new_text)))
-            guess = ctext[block:block + self.__blocksize]
+            ctext = self._encrypt((bytes(new_text)))
+            guess = ctext[block:block + self._blocksize]
             matrix[guess] = b
 
         return matrix
+
+    def _encrypt(self, text):
+        """
+        Wrapper for communicating with server. Override this function if
+        padding needs to be added to text without affecting algorithm
+        """
+        return self._oracle.send(text)
+
 
 
 class OracleClient():
@@ -123,17 +131,17 @@ class OracleClient():
     :param port: port of encryption server
     """
     def __init__(self, host, port):
-        self.__host = host
-        self.__port = port
+        self._host = host
+        self._port = port
 
-    def encrypt(self, msg):
-        self.__s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.__s.connect((self.__host, self.__port))
-        self.__s.send(msg)
-        header = self.__s.recv(4)
+    def send(self, msg):
+        self._s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self._s.connect((self._host, self._port))
+        self._s.send(msg)
+        header = self._s.recv(4)
         csize = struct.unpack("I", header)[0]
-        ciphertext = self.__s.recv(csize)
-        self.__s.close()
+        ciphertext = self._s.recv(csize)
+        self._s.close()
 
         return ciphertext
 

@@ -12,12 +12,12 @@ from Crypto.Cipher import AES
 
 class EcbOracle():
     def __init__(self, host, port, key, unknown):
-        self.__host = host
-        self.__port = port
-        self.__cipher = AES.new(key, AES.MODE_ECB)
-        self.__unknown = unknown
+        self._host = host
+        self._port = port
+        self._cipher = AES.new(key, AES.MODE_ECB)
+        self._unknown = unknown
 
-    def __get_response(self, connection):
+    def _get_response(self, connection):
         """
         continually wait for a response from a client
         :param connection: socket object of client
@@ -35,15 +35,15 @@ class EcbOracle():
 
         return buf
 
-    def __handle_client(self, conn):
+    def _handle_client(self, conn):
         print("[*] Got client: waiting for text to encrypt")
-        text = self.__get_response(conn)
+        text = self._get_response(conn)
         print("[*] Got plaintext, encrypting...")
 
         # AES(user_text || unknown text)
-        text += self.__unknown
+        text += self._unknown
         new_text = pkcs7_pad(text, 16)
-        ctext = self.__cipher.encrypt(new_text)
+        ctext = self._cipher.encrypt(new_text)
 
         clen = struct.pack("I", int(len(ctext)))
         conn.send(clen)
@@ -56,13 +56,13 @@ class EcbOracle():
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             # allows kernel to reuse socket even in TIME_WAIT state
             s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-            s.bind((self.__host, self.__port))
+            s.bind((self._host, self._port))
             s.listen()
             print("[*] Server now listening on {}:{}"
-                  .format(self.__host, self.__port))
+                  .format(self._host, self._port))
             while True:
                 conn, addr = s.accept()
-                self.__handle_client(conn)
+                self._handle_client(conn)
 
 
 def main():
