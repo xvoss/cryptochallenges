@@ -1,6 +1,9 @@
 """
 Set 2: Implement CBC mode
 
+Implementation of AES in CBC mode via the AES ECB from Crypto.Cipher library.
+This was for educational purposes, particularily to learn how to create the
+CBC block chaining mode.
 """
 
 import base64
@@ -10,6 +13,10 @@ from challenge9 import pkcs7_pad
 
 
 class AES_CBC():
+    """
+    Encrypt and decrypt under AES cipher block chain.
+    All parameters and return values are in bytes() object
+    """
     def __init__(self, key, IV):
         self.__IV = IV
         self.__bsize = len(key)

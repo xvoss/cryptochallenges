@@ -1,12 +1,21 @@
 """
-"""
+Set 2: Byte-at-a-time ECB decryption (Harder)
 
+Sets up oracle server. Same as challenge 12, only that the oracle appends
+random amount of bytes BEFORE client's text while still appending unknown
+text. i.e. AES_ECB(random bytes || attacker text || unknown text)
+"""
 import os
 import random
 import base64
 import challenge12_server
 
+
 class EcbOracleHarder(challenge12_server.EcbOracle):
+    """
+    Oracle to encrypt under AES_ECB and send ciphertext back while prefixing
+    constant, but randomly chosen length of bytes before client's text.
+    """
     def __init__(self, host, port, key, unknown):
         amt = random.randint(10, 101)
         self.__prefix = os.urandom(amt)
@@ -45,6 +54,7 @@ def main():
 
     oracle = EcbOracleHarder(HOST, PORT, secret_key, secret_text)
     oracle.start()
+
 
 if __name__ == '__main__':
     main()

@@ -1,10 +1,19 @@
 """
 Set 2: Implement PKCS#7 padding
 
-Test pkcs#7 method
+PKCS#7 is a padding scheme to ensure text is in increments of block size.
+The scheme will add x amount of bytes of value x, where x is the amount of
+space remaining in the incomplete block (blocksize - length of text)
 """
 
+
 def pkcs7_pad(block, bsize):
+    """
+    Use PKCS#7 padding scheme to any text less than or more than blocksize
+
+    :param block: text in bytes
+    :param bsize: block size
+    """
     if len(block) == bsize:
         return block
     elif len(block) < bsize:

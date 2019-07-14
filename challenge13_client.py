@@ -1,19 +1,42 @@
 """
 Set 2: ECB cut-and-paste
 
-ATTACK STRING: user ... | admin... | ... padding ... &uid=10&role= | ...
-take the ciphertext from | admin ... | swap with end of attack string
+The idea behind this attack is to rearrange the cipherblocks around to create
+uninteded text. Specifically adding 'admin...' after '...role=' to gain
+priviledge execution.
+
+This script provides a corrupt username to achieve this and rearranges the
+cipherblocks. To do this we need to encrypt block: admin || pkcs#7 padding.
+Additionally, padding is addded to username to ensure 'role=' is at the end of
+the block. Finally, admin || pkcs#7 is removed from the middle and placed at
+the end of the ciphertext, to be sent to the server.
+
+ATTACK STRING: user= ... | admin ... | ... padding ... &uid=10&role= |
+take the ciphertext from | admin ... | add to end of attack string
 """
 import socket
 
 
 class AdminRoleAttack():
-    def __init__(self, username, oracle, blocksize):
+    """
+    Manipulate profile user=...&uid=...&role=... so that role equals 'admin'.
+    The role must be encrypted under AES ECB mode.
+
+    :param username: bytes(), email address for admin role
+    :param oracle: class, get profile via .create_user() and send profile via
+    .send_profile()
+    :param blocksize: int, blocksize of server's encryption
+    """
+    def __init__(self, username, oracle, blocksize=16):
         self.__oracle = oracle
         self.__username = username
         self.__blocksize = blocksize
 
     def __attack_string(self):
+        """
+        Assemble string to obtain encrypted admin string. Also, adding padding
+        so that 'role=' is at end of block
+        """
         uid_field = b"&uid=10&role="
         assert(len(self.__username) + 5 == self.__blocksize)
 
@@ -31,13 +54,17 @@ class AdminRoleAttack():
         return self.__username + admin_field + padding
 
     def start(self):
+        """
+        Assemble encrypted profile, to create admin account and verify with
+        server.
+        """
         attack = self.__attack_string()
 
         # sends a username thats turns into a encrypted profile
         ctext = self.__oracle.create_user(attack)
 
-        n1 = self.__blocksize # admin field
-        n2 = n1 * 2 # uid field and role field
+        n1 = self.__blocksize  # admin field
+        n2 = n1 * 2  # uid field and role field
         # admin profile encrypted
         en_admin = ctext[n1:n1+self.__blocksize]
         fake = ctext[:n1] + ctext[n2:n2+self.__blocksize] + en_admin
@@ -48,15 +75,13 @@ class AdminRoleAttack():
             print("[*] Failure: unable to create username")
 
 
-
-
-
 class OracleClient():
-
+    """
+    Communicate with encryption server
+    """
     def __init__(self, host, port):
         self.__s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.__s.connect((host, port))
-
 
     def __get_response(self, connection):
         """
@@ -64,7 +89,7 @@ class OracleClient():
         :param connection: socket object of client
         """
         buf = b""
-        #connection.settimeout(2)
+        # connection.settimeout(2)
         try:
             while True:
                 data = connection.recv(4096)
@@ -77,6 +102,12 @@ class OracleClient():
         return buf
 
     def create_user(self, username):
+        """
+        Sends name to server so an 'account' is created
+
+        :param username: bytes() email address
+        :return: encrypted profile, AES_ECB(user=username|uid=...||role=...)
+        """
         self.__s.send(username)
         en_profile = self.__get_response(self.__s)
         return en_profile

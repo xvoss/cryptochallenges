@@ -1,6 +1,8 @@
 """
 Set 2: Byte-at-a-time ECB decryption (simple)
 
+Open server that encrypts clients data with added secret text. The client's
+goal is to decrypt the secret text only with repeated calls to the server.
 """
 import os
 import socket
@@ -11,6 +13,15 @@ from Crypto.Cipher import AES
 
 
 class EcbOracle():
+    """
+    Opens simple socket server which appends an unknown secret to the clients
+    data, then encrypts under AES_ECB and sends that data back.
+
+    :param host: address of server
+    :param port: open on port
+    :param key: secret key for AES encryption, the client will not know it.
+    :param unknown: secret message the client must try to decrypt, in bytes()
+    """
     def __init__(self, host, port, key, unknown):
         self._host = host
         self._port = port
@@ -23,7 +34,7 @@ class EcbOracle():
         :param connection: socket object of client
         """
         buf = b""
-        #connection.settimeout(2)
+        # connection.settimeout(2)
         try:
             while True:
                 data = connection.recv(4096)
@@ -36,6 +47,12 @@ class EcbOracle():
         return buf
 
     def _handle_client(self, conn):
+        """
+        Give client encrypted data, which is in the form: length_of_message
+        (little endian) || encrypted data.
+
+        :param conn: socket object to talk to client
+        """
         print("[*] Got client: waiting for text to encrypt")
         text = self._get_response(conn)
         print("[*] Got plaintext, encrypting...")
@@ -50,7 +67,6 @@ class EcbOracle():
         conn.send(ctext)
         print("[*] Sent encrypted data, closing")
         conn.close()
-
 
     def start(self):
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:

@@ -1,9 +1,20 @@
 """
 Set 2: An ECB/CBC detection oracle
+
+As a test, this script connects to the challenge11_server several times and
+tries to detect if the server uses ECB or CBC block chain mode each time.
+be sure to execute challenge11_server.py before running this script.
+
+How to detect ECB mode in AES?
+Well, every block encrypted under AES always maps to the same ciphertext
+when it uses the same key. So, we send many blocks worth of the same bytes
+and if there are that many repeating cipher blocks, we can assume it is using
+ECB.
 """
 from collections import Counter
 import socket
 import struct
+
 
 def is_ecb(ctext, bsize=16, percent=0.80):
     """
@@ -12,7 +23,7 @@ def is_ecb(ctext, bsize=16, percent=0.80):
 
     :param ctext: text ciphered by AES and with repeating characters
     :param bsize: block size (usually 16 in AES)
-    :param percent: percent of the most common block
+    :param percent: ratio of common block / all blocks to be considered common
     """
     blocks = [ctext[i:i+bsize] for i in range(0, len(ctext), bsize)]
 
@@ -34,6 +45,7 @@ def recv_until(conn, text):
         if text in buf:
             break
 
+
 def recv_all(conn):
         msg_len = 1
         msg = b""
@@ -46,6 +58,7 @@ def recv_all(conn):
                 break
 
         return msg
+
 
 def main():
     BLOCKSIZE = 16

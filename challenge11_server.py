@@ -1,9 +1,15 @@
 """
 Set 2: An ECB/CBC detection oracle
 
-NOTE: there could a better way to detect that a client has disconnected other
-than detecting a broken pipe. Yet, it is not neccessary for this test script.
+A crude implementation of an oracle server. Randomly encrypts data under AES
+EBC or CBC and tells the client if their guess was correct.
 
+The protocol is as follows:
+the server asks for text to encrypt. The text is then randomly encrypted under
+AES in ECB mode or in CBC mode. Then the ciphertext is sent with it's length
+prefixed to it (4 bytes little endian || ciphertext). The server then asks
+whether that ciphertext is in ECB or CBC mode. Based on that response, "yes" or
+"no", the server indicates if that was correct or incorrect to the client.
 """
 
 import os
