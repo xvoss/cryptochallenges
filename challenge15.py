@@ -11,8 +11,13 @@ def strip_pkcs7(plaintext, blocksize=16):
     It is assumed that the plaintext should only consist of ascii characters
     :param plaintext: bytes() object with pkcs#7 padding
     """
-    end = plaintext[-1]
-    text, padding = plaintext[:-end], plaintext[-end:]
+    lastblock = plaintext[-16:]
+    end = lastblock[-1]
+    print(end)
+    if end > 15:
+        return plaintext
+
+    text, padding = lastblock[:-end], lastblock[-end:]
     padsize = blocksize - len(text)
 
     if len(padding) != padsize:
