@@ -10,12 +10,13 @@ space remaining in the incomplete block (blocksize - length of text)
 def pkcs7_pad(block, bsize):
     """
     Use PKCS#7 padding scheme to any text less than or more than blocksize
+    if text is equal to blocksize an entire block is added with just padding
 
     :param block: text in bytes
     :param bsize: block size
     """
     if len(block) == bsize:
-        return block
+        return block + bytes([bsize for _ in range(bsize)])
     elif len(block) < bsize:
         psize = bsize - len(block)
         pad = bytes([psize for _ in range(psize)])
@@ -26,7 +27,7 @@ def pkcs7_pad(block, bsize):
             pad = pkcs7_pad(block[-end:], bsize)
             return block[:-end] + pad
         else:
-            return block
+            return block + bytes([bsize for _ in range(bsize)])
 
 
 def main():

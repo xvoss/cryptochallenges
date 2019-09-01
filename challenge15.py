@@ -13,18 +13,17 @@ def strip_pkcs7(plaintext, blocksize=16):
     """
     lastblock = plaintext[-16:]
     end = lastblock[-1]
-    print(end)
-    if end > 15:
-        return plaintext
+    if end > blocksize:
+        raise ValueError("PKCS7 ERROR: Padding byte is larger than blocksize")
 
     text, padding = lastblock[:-end], lastblock[-end:]
     padsize = blocksize - len(text)
 
     if len(padding) != padsize:
-        raise ValueError("Incorrect amount of bytes in padding")
+        raise ValueError("PKCS7 ERROR: Incorrect amount of bytes in padding")
 
     for b in padding:
         if b != padsize:
-            raise ValueError("Padding byte is incorrect value")
+            raise ValueError("PKCS7 ERROR: Padding byte is incorrect value")
 
     return text
