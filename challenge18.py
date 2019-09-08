@@ -8,12 +8,13 @@ import struct
 
 
 class AES_CTR():
-    def __init__(self, key, nonce, blocksize):
+    def __init__(self, key, nonce, blocksize, inc=True):
         self._key = key
         self._blocksize = blocksize
         self._nonce = nonce
         self._count = 0x0
         self._cipher = AES.new(key, AES.MODE_ECB)
+        self._inc = inc
 
     def encrypt(self, msg):
         n = self._blocksize
@@ -22,10 +23,11 @@ class AES_CTR():
 
         blocks = [msg[i:i+n] for i in range(0, len(msg), n)]
         for b in blocks:
-            #TODO FIX THIS FORMAT WHAT DOES AES ENCRYPT?
             form = struct.pack("Q", self._nonce) + struct.pack("Q", count)
             keystream = self._cipher.encrypt(form)
-            count += 1
+
+            if self._inc:
+                count += 1
 
             if len(b) % n == 0:
                 ciphertext += challenge2.xor(keystream, b)
