@@ -116,7 +116,7 @@ class CBC_Oracle_Attack():
         for b in self._guess:
             dummytext[-index] = b
             for i in dummytext:
-                print("0x{:02} ".format(i), end='')
+                print("0x{:02X} ".format(i), end='')
             print(end="       \r")
             self._corrupt.update(bytes(dummytext))
             if self._oracle(self._corrupt.text):
