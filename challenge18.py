@@ -1,5 +1,7 @@
 """
 Set 3: Implement CTR, the stream cipher mode
+
+TODO: fix decryption bug
 """
 from Crypto.Cipher import AES
 import challenge2
@@ -24,6 +26,8 @@ class AES_CTR():
         blocks = [msg[i:i+n] for i in range(0, len(msg), n)]
         for b in blocks:
             form = struct.pack("Q", self._nonce) + struct.pack("Q", count)
+            print("ALGORITHM", form)
+
             keystream = self._cipher.encrypt(form)
 
             if self._inc:
