@@ -55,6 +55,8 @@ class Oracle():
         plaintext.replace(b"&", b"")
         text = self._prefix + plaintext + self._postfix
 
+        #print(text)
+        #print(pkcs7_pad(text, 16))
         return self._cipher.encrypt(pkcs7_pad(text, 16))
 
     def create_account(self, ciphertext):
